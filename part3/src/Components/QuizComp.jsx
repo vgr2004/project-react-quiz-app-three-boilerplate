@@ -21,35 +21,29 @@ class QuizComp extends Component {
   }
 
   componentDidMount() {
-    this.displayQuestion(this.state.questions, this.state.currQuestion, this.state.nextQuestion, this.state.prevQuestion);
+    this.displayQuestion();
   }
 
-  displayQuestion = (questions = this.state.questions, currQuestion, nextQuestion, prevQuestion) => {
-    let { currQuestionIndex } = this.state;
-    if (this.state.questions.length !== 0) {
-      questions = this.state.questions;
-      currQuestion = questions[currQuestionIndex];
-      nextQuestion = questions[currQuestionIndex + 1];
-      prevQuestion = questions[currQuestionIndex - 1];
+  displayQuestion = () => {
+    const { currQuestionIndex, questions } = this.state;
+    const currQuestion = questions[currQuestionIndex];
+    const nextQuestion = questions[currQuestionIndex + 1];
+    const prevQuestion = questions[currQuestionIndex - 1];
+    const answer = currQuestion.answer;
 
-      const answer = currQuestion.answer;
-
-      this.setState({
-        currQuestion,
-        nextQuestion,
-        prevQuestion,
-        answer
-      });
-    }
+    this.setState({
+      currQuestion,
+      nextQuestion,
+      prevQuestion,
+      answer
+    });
   };
 
   handleNextButtonClick = () => {
     if (this.state.nextQuestion !== undefined) {
       this.setState(prevState => ({
         currQuestionIndex: prevState.currQuestionIndex + 1
-      }), () => {
-        this.displayQuestion(this.state.questions, this.state.currQuestion, this.state.nextQuestion, this.state.prevQuestion);
-      });
+      }), this.displayQuestion);
     }
   };
 
@@ -57,9 +51,7 @@ class QuizComp extends Component {
     if (this.state.prevQuestion !== undefined) {
       this.setState(prevState => ({
         currQuestionIndex: prevState.currQuestionIndex - 1
-      }), () => {
-        this.displayQuestion(this.state.questions, this.state.currQuestion, this.state.nextQuestion, this.state.prevQuestion);
-      });
+      }), this.displayQuestion);
     }
   };
 
@@ -70,34 +62,29 @@ class QuizComp extends Component {
   };
 
   handleOptionClick = (e) => {
-    if (e.target.innerHTML.toLowerCase() === this.state.answer.toLowerCase()) {
-      this.correctAnswer();
-    }
-    else {
-      this.wrongAnswer();
-    }
-  }
+    const selectedOption = e.target.innerHTML.toLowerCase();
+    const { answer } = this.state;
+
+    selectedOption === answer ? this.correctAnswer() : this.wrongAnswer();
+  };
+
   correctAnswer = () => {
-    this.setState(prevstate => ({
-      score: prevstate.score + 1,
-      correctAnswers: prevstate.correctAnswers + 1,
-      currQuestionIndex: prevstate.currQuestionIndex + 1,
-      numberofAnsweredQuestions: prevstate.numberofAnsweredQuestions + 1
-    }), () => {
-      this.displayQuestion(this.state.questions, this.state.currQuestion, this.state.nextQuestion, this.state.prevQuestion);
-    });
+    this.setState(prevState => ({
+      score: prevState.score + 1,
+      correctAnswers: prevState.correctAnswers + 1,
+      currQuestionIndex: prevState.currQuestionIndex + 1,
+      numberofAnsweredQuestions: prevState.numberofAnsweredQuestions + 1
+    }), this.displayQuestion);
 
     alert("Correct answer");
   };
 
   wrongAnswer = () => {
-    this.setState(prevstate => ({
-      wrongAnswers: prevstate.wrongAnswers + 1,
-      currQuestionIndex: prevstate.currQuestionIndex + 1,
-      numberofAnsweredQuestions: prevstate.numberofAnsweredQuestions + 1
-    }), () => {
-      this.displayQuestion(this.state.questions, this.state.currQuestion, this.state.nextQuestion, this.state.prevQuestion);
-    });
+    this.setState(prevState => ({
+      wrongAnswers: prevState.wrongAnswers + 1,
+      currQuestionIndex: prevState.currQuestionIndex + 1,
+      numberofAnsweredQuestions: prevState.numberofAnsweredQuestions + 1
+    }), this.displayQuestion);
 
     alert("Wrong answer");
   };
