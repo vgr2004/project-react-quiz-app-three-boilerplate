@@ -77,6 +77,11 @@ class QuizComp extends Component {
       this.wrongAnswer();
     }
   }
+  handleQuitButtonClick=() =>{
+    if (window.confirm("Are you sure you want to quit?")) {
+      window.location.reload(false);
+    }
+  }
 
   correctAnswer = () => {
     this.setState(prevstate => ({
