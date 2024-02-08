@@ -1,0 +1,60 @@
+.result {
+    text-align: center;
+   
+  }
+  
+  h1 {
+    color: green;
+  }
+  
+  .score {
+    color: blue;
+  }
+  
+  .stats-section {
+    align-self: center;
+    background-color: #f8f8f8;
+    border-left: 5px solid rgb(134, 134, 243);
+    width: 60%;
+    margin: 2rem auto 0 auto;
+    padding: 1.5rem 2rem;
+  }
+  
+  .flex {
+    display: flex;
+    justify-content: space-between;
+    gap: 0rem;
+  }
+  
+  .details {
+    text-align: left;
+  }
+  
+  .stats-text {
+    margin-bottom: 1rem;
+  }
+  
+  .buttons {
+    margin: 30px;
+  }
+  
+  .play,
+  .home-result {
+    border: none;
+    cursor: pointer;
+    padding: 1rem;
+    width: 150px; /* Adjusted width for better aesthetics */
+    font-size: 1rem;
+    margin-right: 30px;
+  }
+  
+  .play {
+    background-color: rgb(118, 118, 214);
+    color: white; /* Added text color for better visibility */
+  }
+  
+  .home-result {
+    background-color: green;
+    color: white; /* Added text color for better visibility */
+  }
+  
