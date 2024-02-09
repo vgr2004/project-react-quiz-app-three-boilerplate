@@ -1,127 +1,110 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import "./Quiz.css";
-import questions from "./Questions.json";
+import "./Quiz.css"; 
+import quizQuestions from "./Questions.json"; 
 
 class QuizComp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      questions: questions,
-      currQuestion: {},
-      nextQuestion: {},
-      prevQuestion: {},
-      currQuestionIndex: 0,
+      currentQuestionNum: 0,
       score: 0,
-      correctAnswers: 0,
-      wrongAnswers: 0,
-      numberofAnsweredQuestions: 0,
-      answer: ''
+      attemptedQuestions: [],
+      questions: quizQuestions, 
     };
   }
 
-  componentDidMount() {
-    this.displayQuestion();
-  }
+  handleNext = () =>
+    this.setState((prevState) => ({
+      currentQuestionNum:
+        prevState.currentQuestionNum < 14
+          ? prevState.currentQuestionNum + 1
+          : prevState.currentQuestionNum,
+    }));
 
-  displayQuestion = () => {
-    const { currQuestionIndex, questions } = this.state;
-    const currQuestion = questions[currQuestionIndex];
-    const nextQuestion = questions[currQuestionIndex + 1];
-    const prevQuestion = questions[currQuestionIndex - 1];
-    const answer = currQuestion.answer;
+  handlePrevious = () =>
+    this.setState((prevState) => ({
+      currentQuestionNum:
+        prevState.currentQuestionNum > 0
+          ? prevState.currentQuestionNum - 1
+          : prevState.currentQuestionNum,
+    }));
 
-    this.setState({
-      currQuestion,
-      nextQuestion,
-      prevQuestion,
-      answer
+  handleOption = (e) => {
+    const selectedAnswer = e.target.innerText;
+    const isCorrect =
+      selectedAnswer === this.state.questions[this.state.currentQuestionNum].answer;
+    alert(isCorrect ? "Correct answer" : "Incorrect answer");
+    if (!this.state.attemptedQuestions.includes(this.state.currentQuestionNum)) {
+      this.setState((prevState) => ({
+        attemptedQuestions: [...prevState.attemptedQuestions, prevState.currentQuestionNum],
+        score: isCorrect ? prevState.score + 1 : prevState.score,
+      }));
+    }
+  };
+
+  handleFinish = () => {
+    this.props.history.push("/finish-quiz", {
+      score: this.state.score,
+      attempted: this.state.attemptedQuestions,
     });
   };
 
-  handleNextButtonClick = () => {
-    if (this.state.nextQuestion !== undefined) {
-      this.setState(prevState => ({
-        currQuestionIndex: prevState.currQuestionIndex + 1
-      }), this.displayQuestion);
-    }
-  };
-
-  handlePrevButtonClick = () => {
-    if (this.state.prevQuestion !== undefined) {
-      this.setState(prevState => ({
-        currQuestionIndex: prevState.currQuestionIndex - 1
-      }), this.displayQuestion);
-    }
-  };
-
-  handleQuitButtonClick = () => {
+  handleQuit = () => {
     if (window.confirm("Are you sure you want to quit?")) {
       window.location.reload(false);
     }
   };
 
-  handleOptionClick = (e) => {
-    const selectedOption = e.target.innerHTML.toLowerCase();
-    const { answer } = this.state;
-
-    selectedOption === answer ? this.correctAnswer() : this.wrongAnswer();
-  };
-
-  correctAnswer = () => {
-    this.setState(prevState => ({
-      score: prevState.score + 1,
-      correctAnswers: prevState.correctAnswers + 1,
-      currQuestionIndex: prevState.currQuestionIndex + 1,
-      numberofAnsweredQuestions: prevState.numberofAnsweredQuestions + 1
-    }), this.displayQuestion);
-
-    alert("Correct answer");
-  };
-
-  wrongAnswer = () => {
-    this.setState(prevState => ({
-      wrongAnswers: prevState.wrongAnswers + 1,
-      currQuestionIndex: prevState.currQuestionIndex + 1,
-      numberofAnsweredQuestions: prevState.numberofAnsweredQuestions + 1
-    }), this.displayQuestion);
-
-    alert("Wrong answer");
-  };
-
   render() {
-    const { currQuestion } = this.state;
+    const { currentQuestionNum } = this.state;
     return (
-      <div className="question">
-        <h2>Question</h2>
-
+      <div className="quiz">
+        <p className="question">Question</p>
         <div>
-          <span>{this.state.currQuestionIndex + 1} of {this.state.questions.length}</span>
-          <h5>{currQuestion.question}</h5>
+          <span className="span-num">{currentQuestionNum + 1} of 15</span>
+          <h5 className="question-text">{this.state.questions[currentQuestionNum].question}</h5>
         </div>
-
-        <div className="Choice-container">
-          <p onClick={this.handleOptionClick} className="choice">{currQuestion.optionB}</p>
-          <p onClick={this.handleOptionClick} className="choice">{currQuestion.optionA}</p>
+        <div className="options">
+          {["A", "B", "C", "D"].map((option, index) => (
+            <p
+              key={index}
+              className="option"
+              onClick={this.handleOption}
+            >
+              {this.state.questions[currentQuestionNum][`option${option}`]}
+            </p>
+          ))}
         </div>
-
-        <div className="Choice-container">
-          <p onClick={this.handleOptionClick} className="choice">{currQuestion.optionC}</p>
-          <p onClick={this.handleOptionClick} className="choice">{currQuestion.optionD}</p>
-        </div>
-
-        <div className="btn-container">
-          <button className="btn previous" onClick={this.handlePrevButtonClick}>Previous</button>
-          <button className="btn next" onClick={this.handleNextButtonClick}>Next</button>
-          <button className="btn quit" onClick={this.handleQuitButtonClick}>Quit</button>
-          <Link to="/finish-quiz" state={{
-            answeredQuestions: this.state.numberofAnsweredQuestions,
+        <div>
+          <button
+            className="btn-move previous"
+            onClick={this.handlePrevious}
+          >
+            Previous
+          </button>
+          <button
+            className="btn-move next"
+            onClick={this.handleNext}
+          >
+            Next
+          </button>
+          <button
+            className="btn-move quit"
+            onClick={this.handleQuit}
+          >
+            Quit
+          </button>
+          <Link to="/finish-quiz" state={{ 
             score: this.state.score,
-            correctAnswer: this.state.correctAnswers,
-            totalQuestions: this.state.questions.length,
-            wrongAnswer: this.state.wrongAnswers
+            attempted: this.state.attemptedQuestions,
           }}>
-            <button id="finish">Finish</button>
+            <button
+              className="btn-move finish"
+              onClick={this.handleFinish}
+            >
+              Finish
+            </button>
           </Link>
         </div>
       </div>
